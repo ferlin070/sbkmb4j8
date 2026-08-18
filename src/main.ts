@@ -36,6 +36,17 @@ const state: AppState = {
 
 const root = document.querySelector<HTMLDivElement>('#app');
 
+// Toast + loading overlay live outside #app so they survive render() calls.
+const toastContainer = document.createElement('div');
+toastContainer.id = 'toast-container';
+toastContainer.className = 'toast-container';
+toastContainer.setAttribute('aria-live', 'polite');
+const loadingOverlay = document.createElement('div');
+loadingOverlay.id = 'loading-overlay';
+loadingOverlay.className = 'loading-overlay';
+loadingOverlay.hidden = true;
+loadingOverlay.innerHTML = '<div class="loading-overlay__spinner" aria-hidden="true"></div><p>Loading your collection…</p>';
+
 const SORT_OPTIONS: [SortKey, SortState['direction'], string][] = [
   ['updatedAt', 'desc', 'Recently updated'],
   ['name', 'asc', 'Name A–Z'],
@@ -48,19 +59,16 @@ const FILTER_STATUSES = ['all', ...CANDLE_STATUSES] as const;
 const STATUS_FILTER_LABELS: Record<string, string> = { all: 'All', ...STATUS_LABELS };
 
 function showToast(message: string, kind: 'info' | 'success' | 'error' = 'info'): void {
-  const container = document.querySelector<HTMLDivElement>('#toast-container');
-  if (!container) return;
   const toast = document.createElement('div');
   toast.className = 'toast toast--' + kind;
   toast.setAttribute('role', 'status');
   toast.textContent = message;
-  container.appendChild(toast);
+  toastContainer.appendChild(toast);
   window.setTimeout(() => toast.remove(), 3500);
 }
 
 function setLoading(loading: boolean): void {
-  const overlay = document.querySelector<HTMLDivElement>('#loading-overlay');
-  if (overlay) overlay.hidden = !loading;
+  loadingOverlay.hidden = !loading;
 }
 
 function statusClass(status: CandleStatus): string {
@@ -151,9 +159,7 @@ ${renderGrid(visible)}
 </section>
 </main>
 </div>
-${modal}
-<div id="toast-container" class="toast-container" aria-live="polite"></div>
-<div id="loading-overlay" class="loading-overlay" hidden><div class="loading-overlay__spinner" aria-hidden="true"></div><p>Loading your collection…</p></div>`;
+${modal}`;
 }
 
 function readDraft(form: HTMLFormElement): CandleDraft | null {
@@ -211,11 +217,17 @@ function persist(): void {
 
 function handleAction(target: HTMLElement): void {
   const { action, id } = target.dataset;
-  if (!action || !id) return;
+  if (!action) return;
+  if (action === 'cancel-edit') {
+    state.editingId = null;
+    render();
+    return;
+  }
+  if (!id) return;
   if (action === 'edit') {
     state.editingId = id;
     render();
-    document.querySelector<HTMLFormElement>('#candle-form')?.scrollIntoView({ behavior: 'smooth' });
+    document.querySelector<HTMLFormElement>('#candle-form')?.scrollIntoView?.({ behavior: 'smooth' });
   } else if (action === 'delete') {
     state.confirmingDeleteId = id;
     render();
@@ -270,6 +282,7 @@ function bindEvents(): void {
 
 function boot(): void {
   if (!root) return;
+  document.body.append(toastContainer, loadingOverlay);
   setLoading(true);
   render();
   window.setTimeout(() => {

@@ -5,16 +5,16 @@ burn status, a 1–5 flame rating, and personal notes.
 
 ## Features
 
-- Add, edit, delete candles; status (Unlit / Burning / Finished); 1–5 rating.
+- Add, edit, delete; status (Unlit / Burning / Finished); 1–5 rating.
 - Search; filter by status; sort by name, brand, rating, or recency.
 - Summary bar (total, burning, finished); persists via `localStorage`.
-- Warm amber palette, soft shadows, flickering glow (respects `prefers-reduced-motion`).
+- Warm amber palette, soft shadows, flickering glow (`prefers-reduced-motion` respected).
 
 ## Architecture
 
 `types.ts` · `schema.ts` · `domain.ts` · `storage.ts` · `render.ts` · `main.ts`.
-Pure logic is side-effect free and unit tested; storage returns results instead
-of throwing; input is HTML-escaped; loading states cover load/save.
+Pure logic is side-effect free and unit tested; storage returns results instead of
+throwing; input is HTML-escaped; loading states cover load/save.
 
 ## Development
 

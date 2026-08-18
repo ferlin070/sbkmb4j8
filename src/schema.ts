@@ -32,15 +32,11 @@ function isStatus(value: unknown): value is CandleStatus {
 export function isCandle(value: unknown): value is Candle {
   if (typeof value !== 'object' || value === null) return false;
   const c = value as Record<string, unknown>;
-  const str = (v: unknown): v is string => typeof v === 'string';
-  const num = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
-  return (
-    str(c.id) && UUID_RE.test(c.id) &&
-    str(c.name) && c.name.trim().length > 0 &&
-    str(c.brand) && str(c.scentNotes) && str(c.notes) &&
-    isStatus(c.status) && isRating(c.rating) &&
-    num(c.createdAt) && num(c.updatedAt)
-  );
+  const s = (v: unknown): v is string => typeof v === 'string';
+  const n = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
+  return s(c.id) && UUID_RE.test(c.id) && s(c.name) && c.name.trim().length > 0 &&
+    s(c.brand) && s(c.scentNotes) && s(c.notes) && isStatus(c.status) && isRating(c.rating) &&
+    n(c.createdAt) && n(c.updatedAt);
 }
 
 export class ValidationError extends Error {
