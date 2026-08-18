@@ -75,11 +75,12 @@ function statusClass(status: CandleStatus): string {
   return 'status status--' + status;
 }
 
-function renderSummary(total: number, burning: number, finished: number): string {
+function renderSummary(total: number, burning: number, finished: number, avg: number | null): string {
   return `<div class="summary">
 <div class="summary__item"><span class="summary__value">${total}</span><span class="summary__label">Total logged</span></div>
 <div class="summary__item"><span class="summary__value summary__value--burning">${burning}</span><span class="summary__label">Burning</span></div>
 <div class="summary__item"><span class="summary__value summary__value--finished">${finished}</span><span class="summary__label">Finished</span></div>
+<div class="summary__item"><span class="summary__value">${avg === null ? '—' : avg + '★'}</span><span class="summary__label">Avg rating</span></div>
 </div>`;
 }
 
@@ -140,7 +141,7 @@ function render(): void {
 <h1 class="masthead__title">🕯️ Candle Collection Log</h1>
 <p class="masthead__subtitle">Catalog every candle you own or have burned through.</p>
 </header>
-${renderSummary(stats.total, stats.burning, stats.finished)}
+${renderSummary(stats.total, stats.burning, stats.finished, stats.averageRating)}
 <section class="controls">
 <div class="controls__search"><input id="search" type="search" placeholder="Search name, brand, scent, notes…" value="${escapeHtml(state.filter.search)}" aria-label="Search candles" /></div>
 <div class="controls__filters">
